@@ -27,7 +27,9 @@
             prefix-icon="iconfont icon-suo"
             v-model="loginForm.password"
             type="password"
+            @keyup.enter.native="login"
           ></el-input>
+          <!-- 在组件框架中使用键盘点击事件需要加native修饰 -->
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
@@ -90,6 +92,11 @@ export default {
        }
        else {
            console.log("登录失败");
+          //  提示错误信息
+          this.$message.error({
+            duration:1000,
+            message:'用户名或密码错误'
+          })
            
        }
       });

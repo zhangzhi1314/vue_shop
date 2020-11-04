@@ -11,28 +11,33 @@
         <el-aside width="200px">
           <!-- 菜单区域 -->
           <el-menu
-          :default-openeds="openeds"
             default-active="2"
             class="el-menu-vertical-demo"
-           
             background-color="#333744"
             text-color="#fff"
-            active-text-color="#ffd04b"
+            active-text-color="#409BFF"
           >
-            <el-submenu index="1" collapse="true">
-            <!-- 一级菜单的模板区域 -->
-              <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>导航一</span>
+            <!-- 为每一模板添加唯一的id值 -->
+            <el-submenu
+              :index="item.id + ''"
+              collapse="true"
+              v-for="item in list"
+              
+              :key="item.id"
+            >
+              <!-- 一级菜单的模板区域 -->
+              <template slot="title" >
+                <i :class="icons[item.id]"></i>
+                <span>{{ item.authName }}</span>
               </template>
               <!-- 二级菜单 -->
-             <el-menu-item index="1-4-1">
-             <template slot="title">
-                <i class="el-icon-location"></i>
-                <span>二级菜单</span>
-              </template>
-             </el-menu-item>
-             
+              <!-- v-bind:index绑定索引值 -->
+              <el-menu-item :index="secondIte.id+''" v-for="secondIte in item.children" :key="secondIte.id" >
+                <template slot="title">
+                  <i class="iconfont icon-all"></i>
+                  <span>{{ secondIte.authName }}</span>
+                </template>
+              </el-menu-item>
             </el-submenu>
           </el-menu>
         </el-aside>
@@ -43,16 +48,36 @@
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
-      openeds: ['1'],
-      uniqueOpened: false
-    }
-},
+      list: [],
+      icons:{
+        '125':'iconfont icon-user',
+        '103':'iconfont icon-fenghuangxiangmutubiao_quanxian',
+        '101':'iconfont icon-shangpin',
+        '102':'iconfont icon-dingdan',
+        '145':'iconfont icon-gouwuche'
+      }
+    };
+  },
+  // 页面创建时，立即获取左侧列表信息
+  created() {
+    this.getMenuList();
+  },
   methods: {
     logOut() {
       window.sessionStorage.clear();
       this.$router.push("/login");
+    },
+    // 从后台获取列表数据
+    async getMenuList() {
+      const { data: listInf } = await this.$http.get("menus");
+      console.log(listInf);
+      // 做出判断，当成功从接口获取权限列表时才进行赋值
+      if (listInf.meta.status !== 200) {
+        console.log(listInf.meta.msg);
+      }
+      this.list = listInf.data;
     },
   },
 };
