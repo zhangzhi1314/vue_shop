@@ -11,7 +11,7 @@
         <el-aside width="iscollapse ? 56px:200px">
           <!-- 菜单区域 -->
           <el-menu
-            default-active="2"
+            :default-active="itemPath"
             class="el-menu-vertical-demo"
             background-color="#333744"
             text-color="#fff"
@@ -44,6 +44,7 @@
                 :index="'/'+secondIte.path"
                 v-for="secondIte in item.children"
                 :key="secondIte.id"
+                @click="saveItemState('/'+secondIte.path)"
               >
                 <template slot="title">
                   <i class="iconfont icon-all"></i>
@@ -62,6 +63,7 @@
 export default {
   data() {
     return {
+      itemPath:'',
       list: [],
       iscollapse: false,
       icons: {
@@ -76,8 +78,13 @@ export default {
   // 页面创建时，立即获取左侧列表信息
   created() {
     this.getMenuList();
+    this.itemPath = window.sessionStorage.getItem('ItemState')
   },
   methods: {
+    // 把当前页面的path放到session里面
+    saveItemState(ItemState){
+      window.sessionStorage.setItem('ItemState',ItemState)
+    },
     isFold() {
       this.iscollapse = !this.iscollapse;
     },
