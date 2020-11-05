@@ -83,7 +83,8 @@ export default {
   methods: {
     // 把当前页面的path放到session里面
     saveItemState(ItemState){
-      window.sessionStorage.setItem('ItemState',ItemState)
+      window.sessionStorage.setItem('ItemState',ItemState);
+      this.itemPath = ItemState
     },
     isFold() {
       this.iscollapse = !this.iscollapse;
