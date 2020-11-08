@@ -33,8 +33,9 @@
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
-          <el-button type="primary" plain @click="login" style="width:410px">登录</el-button>
-         
+          <el-button type="primary" plain @click="login" style="width: 410px"
+            >登录</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -61,7 +62,7 @@ export default {
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, max: 20, message: "长度在 6 到20个字符", trigger: "blur" },
+          { min: 3, max: 20, message: "长度在 6 到20个字符", trigger: "blur" },
         ],
       },
     };
@@ -73,32 +74,29 @@ export default {
       this.$refs.loginForm.resetFields();
     },
     login() {
-      this.$refs.loginForm.validate(async valid => {
+      this.$refs.loginForm.validate(async (valid) => {
         console.log(valid);
         if (!valid) {
           return;
         }
         // 通过解构赋值获取data里面的值
-       const {data:msg}= await this.$http.post('login',this.loginForm);
-       if (msg.meta.status === 200){
-           console.log(msg);
-           console.log("登录成功");
-           this.$message.success({duration:1000,
-           message:'登录成功'
-           });
-           window.sessionStorage.setItem("token",msg.data.token);
-        //    编程式导航
-           this.$router.push('/home')
-       }
-       else {
-           console.log("登录失败");
+        const { data: msg } = await this.$http.post("login", this.loginForm);
+        if (msg.meta.status === 200) {
+          console.log(msg);
+          console.log("登录成功");
+          this.$message.success({ duration: 1000, message: "登录成功" });
+          window.sessionStorage.setItem("token", msg.data.token);
+          window.sessionStorage.setItem("username", this.loginForm.username);
+          //    编程式导航
+          this.$router.push("/home");
+        } else {
+          console.log("登录失败");
           //  提示错误信息
           this.$message.error({
-            duration:1000,
-            message:'用户名或密码错误'
-          })
-           
-       }
+            duration: 1000,
+            message: "用户名或密码错误",
+          });
+        }
       });
     },
   },

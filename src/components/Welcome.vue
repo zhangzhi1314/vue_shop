@@ -1,13 +1,16 @@
 <template>
-  <div>首页 {{name}}</div>
+  <div>首页 {{ name }}</div>
 </template>
 <script>
-import Login from "@/components/Login";
+
 export default {
   data() {
     return {
-      name: {},
+      name: '',
     };
+  },
+  created(){
+      this.name = window.sessionStorage.getItem('username')
   }
 };
 </script>

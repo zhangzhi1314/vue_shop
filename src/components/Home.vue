@@ -10,6 +10,7 @@
       <el-container>
         <el-aside width="iscollapse ? 56px:200px">
           <!-- 菜单区域 -->
+          <!-- router=true开启路由模式，以index为路由链接-->
           <el-menu
             :default-active="itemPath"
             class="el-menu-vertical-demo"
