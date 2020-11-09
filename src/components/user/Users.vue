@@ -6,6 +6,28 @@
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!--添加按钮弹出内容-->
+    <!--弹出修改用户信息-->
+    <el-dialog title="修改信息" :visible.sync="dialogVisible" width="30%">
+      <el-form label-width="80px" :rules="rules" ref="upForm" :model="upForm">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="upForm.username" :disabled="true"></el-input>
+        </el-form-item>
+
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="upForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="upForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="canup()"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
+    <!--弹出添加用户-->
     <el-dialog
       title="请输入用户信息"
       :visible.sync="centerDialogVisible"
@@ -90,10 +112,16 @@
             <el-tooltip
               class="item"
               effect="dark"
-              content="Top Left 提示文字"
+              content="修改用户信息"
               placement="top-start"
             >
-              <el-button type="primary" icon="el-icon-edit" circle> </el-button>
+              <el-button
+                type="primary"
+                icon="el-icon-edit"
+                circle
+                @click="upUser(scope)"
+              >
+              </el-button>
             </el-tooltip>
             <el-tooltip
               class="item"
@@ -113,7 +141,12 @@
               content="删除成员"
               placement="top-start"
             >
-              <el-button type="danger" icon="el-icon-delete" circle @click="delUser(scope)"></el-button>
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                circle
+                @click="delUser(scope)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -124,7 +157,7 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="queryInf.pagenum"
-          :page-sizes="[1, 2, 3, 4]"
+          :page-sizes="[1, 2, 3, 4, 5, 6]"
           :page-size="queryInf.pagesize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
@@ -138,11 +171,18 @@
 export default {
   data() {
     return {
+      id:0,
+      upForm: {
+        username: "123",
+        password: "123",
+        email: "964494582",
+        mobile: "121212",
+      },
       ruleForm: {
-        username: "",
-        password: "",
-        email: "",
-        mobile: "",
+        username: "123",
+        password: "123",
+        email: "964494582",
+        mobile: "121212",
       },
       rules: {
         username: [
@@ -162,15 +202,16 @@ export default {
         mobile: [{ required: true, message: "请输入手机号", trigger: "blur" }],
       },
       centerDialogVisible: false,
+      dialogVisible: false,
       total: 0,
       userList: [],
       queryInf: {
         // 搜索关键字
         query: "",
-        // 当前页数显示多少条数据
-        pagenum: 1,
         // 页码数
-        pagesize: 4,
+        pagenum: 1,
+        // 当前页显示数量
+        pagesize: 6,
       },
     };
   },
@@ -179,22 +220,65 @@ export default {
     this.getUserList();
   },
   methods: {
-    // 删除用户
-   async delUser(inf){
-     console.log(inf);
-     const {data:msg} = await this.$http.delete(`users/${inf.row.id}`);
-     console.log(msg);
-     this.getUserList()
+    //修改用户信息
+     upUser(inf) {
+      this.dialogVisible = true;
+      console.log("开始修改");
+      this.upForm = inf.row;
+      this.id = inf.row.id
     },
-    // 添加新用户
-   async addUser() {
-      this.centerDialogVisible = false;
-      console.log(this.ruleForm);
-      const {data:msg} = await this.$http.post('users',
-        this.ruleForm);
-    
+    async canup(){
+      const rowid = this.id;
+        const { data:msg } = await this.$http.put(`users/${rowid}`, {
+        email: this.upForm.email,
+        mobile: this.upForm.mobile,
+      });
+      this.dialogVisible = false;
+      console.log(this.upForm.email);
+      console.log(msg);
+      this.getUserList();
+    },
+    // 删除用户
+    async delUser(inf) {
+      /*var flag = 1;
+      console.log(inf);
+     this.userList.splice(inf.$index,1);
+     const that = this;
+      this.$message.success({ duration: 3000, message: "成功删除",showClose:true,
+      onClose:function(){
+        flag = 2;
+        that.getUserList();
+        
+      }
+     
+    })*/
+
+      const { data: msg } = await this.$http.delete(`users/${inf.row.id}`);
+      console.log(msg);
       this.getUserList();
 
+      /* const { data:msg } = await this.$http.delete(`users/${inf.row.id}`);
+      console.log(msg);
+      this.getUserList();
+      this.$message.success({ duration: 3000, message: "成功删除",showClose:true,
+      onClose:function(){
+        console.log("hah");
+      } }) */
+    },
+    // 添加新用户
+    async addUser() {
+      this.centerDialogVisible = false;
+
+      for (let i = 0; i <= 20; i++) {
+        const { data: msg } = await this.$http.post("users", {
+          username: this.ruleForm.username++,
+          password: "123",
+          email: "964494582",
+          mobile: "121212",
+        });
+      }
+
+      this.getUserList();
     },
     // 监听switch开关
     async userStatus(userinf) {
@@ -215,6 +299,9 @@ export default {
       this.getUserList();
     },
     async getUserList() {
+      if (this.userList.length == 1) {
+        --this.queryInf.pagenum;
+      }
       const { data: res } = await this.$http.get("users", {
         params: this.queryInf,
       });
@@ -224,6 +311,7 @@ export default {
       console.log(res);
       //   将后台获取的管理员信息赋值给this.userList
       this.userList = res.data.users;
+      console.log(this.userList);
       this.total = res.data.total;
     },
   },
