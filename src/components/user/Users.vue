@@ -21,10 +21,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="canup()"
-          >确 定</el-button
-        >
+        <el-button @click="reset()">取 消</el-button>
+        <el-button type="primary" @click="canup()">确 定</el-button>
       </span>
     </el-dialog>
     <!--弹出添加用户-->
@@ -171,16 +169,15 @@
 export default {
   data() {
     return {
-      id:0,
+      id: 0,
       upForm: {
-        username: "123",
-        password: "123",
+        
         email: "964494582",
         mobile: "121212",
       },
       ruleForm: {
         username: "123",
-        password: "123",
+        password: "123456789",
         email: "964494582",
         mobile: "121212",
       },
@@ -220,16 +217,22 @@ export default {
     this.getUserList();
   },
   methods: {
+    //取消修改时重新获得数据
+    reset(){
+     this.dialogVisible = false;
+       this.getUserList();
+    },
     //修改用户信息
-     upUser(inf) {
+    upUser(inf) {
       this.dialogVisible = true;
       console.log("开始修改");
       this.upForm = inf.row;
-      this.id = inf.row.id
+      this.id = inf.row.id;
+     
     },
-    async canup(){
+    async canup() {
       const rowid = this.id;
-        const { data:msg } = await this.$http.put(`users/${rowid}`, {
+      const { data: msg } = await this.$http.put(`users/${rowid}`, {
         email: this.upForm.email,
         mobile: this.upForm.mobile,
       });
@@ -237,6 +240,7 @@ export default {
       console.log(this.upForm.email);
       console.log(msg);
       this.getUserList();
+       this.$message.success({ duration: 1000, message: "修改成功" })
     },
     // 删除用户
     async delUser(inf) {
@@ -248,9 +252,9 @@ export default {
       onClose:function(){
         flag = 2;
         that.getUserList();
-        
+
       }
-     
+
     })*/
 
       const { data: msg } = await this.$http.delete(`users/${inf.row.id}`);
@@ -266,19 +270,25 @@ export default {
       } }) */
     },
     // 添加新用户
-    async addUser() {
-      this.centerDialogVisible = false;
-
-      for (let i = 0; i <= 20; i++) {
-        const { data: msg } = await this.$http.post("users", {
-          username: this.ruleForm.username++,
-          password: "123",
-          email: "964494582",
-          mobile: "121212",
-        });
+     addUser() {
+      this.$refs.ruleForm.validate(async (valid)=>{
+        if (!valid){
+          return;
+        } 
+        this.centerDialogVisible = false;
+      const { data: msg } = await this.$http.post("users", {
+        username: this.ruleForm.username,
+        password: this.ruleForm.password,
+        email: this.ruleForm.email,
+        mobile: this.ruleForm.mobile,
+      });
+      console.log(msg);
+      if (msg.meta.status === 201) {
+        this.$message.success("添加用户成功");
       }
-
       this.getUserList();
+      })
+     
     },
     // 监听switch开关
     async userStatus(userinf) {

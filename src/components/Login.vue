@@ -70,12 +70,12 @@ export default {
   //   重置表单输入内容
   methods: {
     formClear() {
-      console.log(this);
+
       this.$refs.loginForm.resetFields();
     },
     login() {
       this.$refs.loginForm.validate(async (valid) => {
-        console.log(valid);
+
         if (!valid) {
           return;
         }

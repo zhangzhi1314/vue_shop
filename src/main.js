@@ -14,7 +14,7 @@ axios.interceptors.request.use(config=>
   // 为请求头对象添加验证
   {
     config.headers.Authorization =  window.sessionStorage.getItem('token');
-    console.log(config);
+
     return config
   }
   )
