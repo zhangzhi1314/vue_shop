@@ -6,6 +6,33 @@
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!--添加按钮弹出内容-->
+    <!--弹出分配角色的对话框-->
+
+    <el-dialog title="分配角色" :visible.sync="setDialogVisible" width="30%" @close="clearSelectId">
+      <div>
+        <p><span>当前用户：</span> {{ currentName }}</p>
+
+        <p><span>当前角色：</span> {{ currentRole }}</p>
+
+        <p>
+          <span>可选角色：</span>
+          <el-select v-model="selectId" placeholder="请选择">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRole()">确 定</el-button>
+      </span>
+    </el-dialog>
     <!--弹出修改用户信息-->
     <el-dialog title="修改信息" :visible.sync="dialogVisible" width="30%">
       <el-form label-width="80px" :rules="rules" ref="upForm" :model="upForm">
@@ -105,7 +132,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column prop="" label="操作" width="180">
+        <el-table-column prop="" label="操作">
           <template slot-scope="scope">
             <el-tooltip
               class="item"
@@ -131,6 +158,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 circle
+                @click="dealRoles(scope)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
@@ -169,9 +197,13 @@
 export default {
   data() {
     return {
+      rolesList: [],
+      currentId: "", //当前的用户id
+      currentName: "",
+      currentRole: "",
+      selectId: "", //已选中的角色id
       id: 0,
       upForm: {
-        
         email: "964494582",
         mobile: "121212",
       },
@@ -200,6 +232,7 @@ export default {
       },
       centerDialogVisible: false,
       dialogVisible: false,
+      setDialogVisible: false,
       total: 0,
       userList: [],
       queryInf: {
@@ -215,12 +248,48 @@ export default {
 
   created() {
     this.getUserList();
+    this.getRoles();
   },
   methods: {
+    //获取所有角色列表
+    async getRoles() {
+      const { data: msg } = await this.$http.get("roles");
+      console.log(msg);
+      this.rolesList = msg.data;
+      console.log(this.rolesList);
+    },
+    //分配角色
+    dealRoles(scope) {
+      console.log(scope.row);
+      this.currentId = scope.row.id;
+      this.currentName = scope.row.username;
+      this.currentRole = scope.row.role_name;
+      this.setDialogVisible = true;
+    },
+    //用户确认后，保存用户修改的角色
+    async saveRole() {
+      const { data: msg } = await this.$http.put(
+        `users/${this.currentId}/role`,
+        {
+          rid: this.selectId,
+        }
+      );
+      if (msg.meta.status !== 200) {
+        return console.log(msg.meta.msg);
+      }
+      console.log(msg);
+      this.getUserList();
+      this.$message.success({ message: "更新角色chengg", duration: 1500 });
+      this.setDialogVisible = false;
+    },
+    //监听分配角色对话框关闭时，用户选择的角色id开始清空
+    clearSelectId() {
+      this.selectId = "";
+    },
     //取消修改时重新获得数据
-    reset(){
-     this.dialogVisible = false;
-       this.getUserList();
+    reset() {
+      this.dialogVisible = false;
+      this.getUserList();
     },
     //修改用户信息
     upUser(inf) {
@@ -228,7 +297,6 @@ export default {
       console.log("开始修改");
       this.upForm = inf.row;
       this.id = inf.row.id;
-     
     },
     async canup() {
       const rowid = this.id;
@@ -240,7 +308,7 @@ export default {
       console.log(this.upForm.email);
       console.log(msg);
       this.getUserList();
-       this.$message.success({ duration: 1000, message: "修改成功" })
+      this.$message.success({ duration: 1000, message: "修改成功" });
     },
     // 删除用户
     async delUser(inf) {
@@ -270,25 +338,24 @@ export default {
       } }) */
     },
     // 添加新用户
-     addUser() {
-      this.$refs.ruleForm.validate(async (valid)=>{
-        if (!valid){
+    addUser() {
+      this.$refs.ruleForm.validate(async (valid) => {
+        if (!valid) {
           return;
-        } 
+        }
         this.centerDialogVisible = false;
-      const { data: msg } = await this.$http.post("users", {
-        username: this.ruleForm.username,
-        password: this.ruleForm.password,
-        email: this.ruleForm.email,
-        mobile: this.ruleForm.mobile,
+        const { data: msg } = await this.$http.post("users", {
+          username: this.ruleForm.username,
+          password: this.ruleForm.password,
+          email: this.ruleForm.email,
+          mobile: this.ruleForm.mobile,
+        });
+        console.log(msg);
+        if (msg.meta.status === 201) {
+          this.$message.success("添加用户成功");
+        }
+        this.getUserList();
       });
-      console.log(msg);
-      if (msg.meta.status === 201) {
-        this.$message.success("添加用户成功");
-      }
-      this.getUserList();
-      })
-     
     },
     // 监听switch开关
     async userStatus(userinf) {

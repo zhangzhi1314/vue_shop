@@ -9,13 +9,13 @@
   <!--表格区域-->
     <el-card>
       <el-table :data="rightData" stripe style="width: 100%" border>
-        <el-table-column type="index" width="50" label="编号">
+        <el-table-column type="index" width="180" label="编号">
         </el-table-column>
-        <el-table-column prop="id" label="权限ID" width="180">
+        <el-table-column prop="id" label="权限ID" width="280">
         </el-table-column>
-        <el-table-column prop="authName" label="权限名称" width="180">
+        <el-table-column prop="authName" label="权限名称" width="280">
         </el-table-column>
-        <el-table-column prop="path" label="路径" width="180">
+        <el-table-column prop="path" label="路径" width="280">
         </el-table-column>
         <el-table-column prop="level" label="权限等级">
         <template slot-scope="scope">

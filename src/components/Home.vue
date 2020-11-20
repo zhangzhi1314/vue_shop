@@ -5,8 +5,25 @@
         <div>
           <span>后台管理系统</span>
         </div>
-        <el-button @click="logOut">退出</el-button></el-header
-      >
+        <div>
+          <el-dropdown trigger="click">
+            <div>
+              <el-avatar
+                src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80"
+              ></el-avatar>
+              <i class="el-icon-caret-bottom" />
+            </div>
+
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>个人信息</el-dropdown-item>
+              <!-- 加native才能触发点击事件-->
+              <el-dropdown-item divided @click.native="logOut"
+                >退出</el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+      </el-header>
       <el-container>
         <el-aside width="iscollapse ? 56px:200px">
           <!-- 菜单区域 -->
@@ -17,19 +34,16 @@
             background-color="#333744"
             text-color="#fff"
             active-text-color="#409BFF"
-            :collapse="iscollapse" 
+            :collapse="iscollapse"
             :collapse-transition="false"
-            
             :router="true"
           >
             <div class="btn-zhedie" @click="isFold">|||</div>
             <!-- 为每一模板添加唯一的id值 -->
             <el-submenu
               :index="item.id + ''"
-             
               v-for="item in list"
               :key="item.id"
-             
             >
               <!-- 一级菜单的模板区域 -->
               <template slot="title">
@@ -42,10 +56,10 @@
               <!-- secondIte.path指定路由的路径 -->
 
               <el-menu-item
-                :index="'/'+secondIte.path"
+                :index="'/' + secondIte.path"
                 v-for="secondIte in item.children"
                 :key="secondIte.id"
-                @click="saveItemState('/'+secondIte.path)"
+                @click="saveItemState('/' + secondIte.path)"
               >
                 <template slot="title">
                   <i class="iconfont icon-all"></i>
@@ -64,7 +78,7 @@
 export default {
   data() {
     return {
-      itemPath:'',
+      itemPath: "",
       list: [],
       iscollapse: false,
       icons: {
@@ -79,13 +93,13 @@ export default {
   // 页面创建时，立即获取左侧列表信息
   created() {
     this.getMenuList();
-    this.itemPath = window.sessionStorage.getItem('ItemState')
+    this.itemPath = window.sessionStorage.getItem("ItemState");
   },
   methods: {
     // 把当前页面的path放到session里面
-    saveItemState(ItemState){
-      window.sessionStorage.setItem('ItemState',ItemState);
-      this.itemPath = ItemState
+    saveItemState(ItemState) {
+      window.sessionStorage.setItem("ItemState", ItemState);
+      this.itemPath = ItemState;
     },
     isFold() {
       this.iscollapse = !this.iscollapse;
@@ -138,7 +152,7 @@ export default {
   line-height: 28px;
   text-align: center;
   background-color: #4a506c;
- 
+
   cursor: pointer;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div>首页 {{ name }}</div>
+  <div>欢迎你 {{ name }}</div>
 </template>
 <script>
 
