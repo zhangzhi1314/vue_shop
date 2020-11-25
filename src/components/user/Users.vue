@@ -107,6 +107,7 @@
             >添加用户</el-button
           >
         </el-col>
+        
       </el-row>
       <el-table :data="userList" stripe style="width: 100%" border="">
         <el-table-column type="index" width="50" label="编号">
@@ -279,7 +280,7 @@ export default {
       }
       console.log(msg);
       this.getUserList();
-      this.$message.success({ message: "更新角色chengg", duration: 1500 });
+      this.$message.success({ message: "更新角色成功", duration: 1500 });
       this.setDialogVisible = false;
     },
     //监听分配角色对话框关闭时，用户选择的角色id开始清空

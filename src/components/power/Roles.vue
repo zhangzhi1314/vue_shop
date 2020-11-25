@@ -72,6 +72,7 @@
                 </el-row>
               </el-col>
             </el-row>
+            <span>-----</span>
           </template>
         </el-table-column>
         <el-table-column type="index" label="编号" width="180">
